@@ -18,18 +18,21 @@ const registerUserIntoDB =async(payload:Iuser)=>{
 
    const createduser = await prisma.user.create({
     data:{
-        name,email, password:hashPassword
-    },
+        name,email, password:hashPassword,
+        profile:{
+            create:{
+                profilephoto
+            }
+        }
+       
+    }
+    
+    
     
    })
 
-    await prisma.profile.create({
-    data:{
-        userId:createduser.id,
-        profilephoto
 
-    }
-   })
+
 
    const user = await prisma.user.findUnique({
     where:{
