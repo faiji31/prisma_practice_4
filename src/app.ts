@@ -6,6 +6,7 @@ import httpStatus from 'http-status'
 import { prisma } from "../lib/prisma";
 import bcyrpt from 'bcrypt'
 import { userRoutes } from "./modules/user/user.routes";
+import { authRoutes } from "./modules/auth/auth.routes";
 
 
 
@@ -26,6 +27,7 @@ app.get("/",(req:Request,res:Response)=>{
 
 
 app.use("/api/users",userRoutes)
+app.use('/api/auth',authRoutes)
 
 
 export default app
