@@ -1,47 +1,60 @@
-import { prisma } from "../../../lib/prisma"
-import { IloginUser } from "./auth.interface"
-import bcyrpt from 'bcrypt'
-import jwt from 'jsonwebtoken'
+import { prisma } from "../../../lib/prisma";
+import config from "../../config";
+import { jwtutlis } from "../../utlis/jwt";
+import { IloginUser } from "./auth.interface";
+import bcyrpt from "bcrypt";
+import jwt, { SignOptions } from "jsonwebtoken";
 
+const loginUser = async (payload: IloginUser) => {
+  const { email, password } = payload;
+  const user = await prisma.user.findFirstOrThrow({
+    where: { email },
+  });
+  const passwordMatched = await bcyrpt.compare(password, user.password);
 
-const loginUser=async(payload:IloginUser)=>{
+  if (!passwordMatched) {
+    throw new Error("Password is not matched!");
+  }
 
-    const {email,password} = payload 
-    const user = await prisma.user.findFirstOrThrow({
-        where:{email}
-    })
-    const passwordMatched = await bcyrpt.compare(password,user.password)
+  const jwtPayload = {
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    role: user.role,
+  };
 
-    if(!passwordMatched){
-        throw new Error("Password is not matched!")
-    }
-  
+  // const accessToken = jwt.sign( jwtPayload
 
-    const accessToken = jwt.sign({
-        id:user.id,
-        email:user.email,
-        name:user.name,
-        role:user.role
-    },"accessSecret",{
-        expiresIn:"1d"
+  // ,config.jwt_access_secret,
+  //    {
+  //     expiresIn: config.jwt_refreseh_expires_in
+  //    } as SignOptions
+  // )
 
-    })
-    const refreshToken = jwt.sign({
-         id:user.id,
-        email:user.email,
-        name:user.name,
-        role:user.role
-    },"refreshSecret",{
-        expiresIn:"7d"
-    })
-    return {
-        accessToken,
-        refreshToken
-    }
+  const accessToken = jwtutlis.createToken(
+    jwtPayload,
+    config.jwt_access_secret,
+    config.jwt_access_expires_in as SignOptions ,
+  );
+  // const refreshToken = jwt.sign( jwtPayload,
+  //      config.jwt_referesh_secret,
+  //      {
+  //         expiresIn:config.jwt_refreseh_expires_in
+  //      } as SignOptions
+  // ,
+  // )
 
-}
+  const refreshToken = jwtutlis.createToken(
+    jwtPayload,
+    config.jwt_referesh_secret,
+    config.jwt_refreseh_expires_in as SignOptions,
+  );
+  return {
+    accessToken,
+    refreshToken,
+  };
+};
 
-
-export const authService={
-    loginUser
-}
+export const authService = {
+  loginUser,
+};
