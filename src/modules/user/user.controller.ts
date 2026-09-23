@@ -23,6 +23,10 @@ const registerUser = catchAsync(async(req:Request,res:Response,next:NextFunction
 
    
 })
+const getMyProfile = ()=>{
+
+}
 export const userController = {
   registerUser,
+  getMyProfile
 };
