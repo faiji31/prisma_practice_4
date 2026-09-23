@@ -1,6 +1,7 @@
 import { prisma } from "../../../lib/prisma"
 import { IloginUser } from "./auth.interface"
 import bcyrpt from 'bcrypt'
+import jwt from 'jsonwebtoken'
 
 
 const loginUser=async(payload:IloginUser)=>{
@@ -14,7 +15,29 @@ const loginUser=async(payload:IloginUser)=>{
     if(!passwordMatched){
         throw new Error("Password is not matched!")
     }
-    return user
+  
+
+    const accessToken = jwt.sign({
+        id:user.id,
+        email:user.email,
+        name:user.name,
+        role:user.role
+    },"accessSecret",{
+        expiresIn:"1d"
+
+    })
+    const refreshToken = jwt.sign({
+         id:user.id,
+        email:user.email,
+        name:user.name,
+        role:user.role
+    },"refreshSecret",{
+        expiresIn:"7d"
+    })
+    return {
+        accessToken,
+        refreshToken
+    }
 
 }
 
