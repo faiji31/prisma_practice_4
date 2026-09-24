@@ -28,6 +28,7 @@ const registerUser = catchAsync(async(req:Request,res:Response,next:NextFunction
 const getMyProfile = catchAsync(async(req:Request,res:Response,next:NextFunction)=>{
 
 
+
   // const {accessToken} = req.cookies
   // console.log(req.user, "my profile")
 
@@ -46,7 +47,23 @@ const getMyProfile = catchAsync(async(req:Request,res:Response,next:NextFunction
     data:{profile}
   })
 })
+const UpdateMyProfile = catchAsync(async(req:Request,res:Response,next:NextFunction)=>{
+   const userid = req.user?.id as string 
+   const payload = req.body
+
+   const UpdatedProfile =  await userService.UpdateMyProfileIntoDB(userid,payload)
+
+   sendResponse(res,{
+          success:true,
+          statusCode:httpStatus.OK,
+          message:"user profile updated successfully!",
+          data:{
+            UpdatedProfile
+          }
+   })
+  })
 export const userController = {
   registerUser,
-  getMyProfile
+  getMyProfile,
+  UpdateMyProfile
 };
