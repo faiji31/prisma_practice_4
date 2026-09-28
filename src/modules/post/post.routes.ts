@@ -5,7 +5,11 @@ import { Router } from "express";
 const router = Router()
 
 
-router.post('/posts',)
+router.post('/',)
+router.get("/statas")
+router.get('/my-post')
+router.patch("/:postId")
+router.delete("/:postId")
 
 
 
